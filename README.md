@@ -1,16 +1,16 @@
-# Website Monitor
+# rlcheck - Rust live check tool
 
-A Rust program that monitors websites for uptime and content changes.
+A Rust program that live checks websites for uptime and content changes.
 
 ## Features
 
-- ✅ Checks if websites are up (HTTP status)
-- 🔄 Detects content changes using MD5 hashing
-- ⚙️ Configurable check intervals per site
-- 📋 YAML configuration file
-- 🔄 Monitors multiple sites concurrently
-- 📝 Optional logging to file with automatic log rotation
-- 🔄 Log rotation: maintains up to 4 log files with 20K lines each
+- Checks if websites are up (HTTP status)
+- Detects content changes using MD5 hashing
+- Configurable check intervals per site
+- YAML configuration file
+- Monitors multiple sites concurrently
+- Optional logging to file with automatic log rotation
+- Log rotation: maintains up to 4 log files with 20K lines each
 
 ## Configuration
 

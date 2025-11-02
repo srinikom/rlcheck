@@ -1,8 +1,8 @@
-# Makefile for website-monitor
+# Makefile for rlcheck
 
 # Variables
 CARGO := cargo
-BINARY_NAME := website-monitor
+BINARY_NAME := rlcheck
 CONFIG_FILE := config.yaml
 
 # Default target

@@ -9,8 +9,8 @@ use std::time::{Duration, Instant};
 use tokio::time;
 
 #[derive(Parser, Debug)]
-#[command(name = "website-monitor")]
-#[command(about = "Monitor websites for uptime and content changes", long_about = None)]
+#[command(name = "rlcheck")]
+#[command(about = "Rust live check for uptime and content changes", long_about = None)]
 struct Args {
     /// Path to config file
     #[arg(short, long, default_value = "config.yaml")]
