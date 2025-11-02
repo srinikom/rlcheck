@@ -34,6 +34,17 @@ sites:
 
 ## Usage
 
+```bash
+make install
+# installs rlcheck binary under: $HOME/.cargo/bin
+# make sure $HOME/.cargo/bin is in your $PATH
+cp config.yaml config.prod.yaml
+# update config.prod.yaml file with url and interval
+make prod
+
+# Tested on Mac and Linux
+```
+
 ### Build the project
 
 ```bash

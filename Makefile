@@ -4,6 +4,9 @@
 CARGO := cargo
 BINARY_NAME := rlcheck
 CONFIG_FILE := config.yaml
+LOG_FILE := monitor.log
+PROD_CONFIG_FILE := config.prod.yaml
+PROD_LOG_FILE := prod.log
 
 # Default target
 .PHONY: all
@@ -47,7 +50,7 @@ run-config:
 # Run with logging enabled
 .PHONY: run-log
 run-log:
-	$(CARGO) run -- --log-file monitor.log
+	$(CARGO) run -- --log-file $(LOG_FILE)
 
 # Check the code without building
 .PHONY: check
@@ -78,6 +81,10 @@ clean:
 .PHONY: install
 install:
 	$(CARGO) install --path .
+
+# Run in prod
+prod:
+	nohup $(BINARY_NAME) --config $(PROD_CONFIG_FILE) --log-file $(PROD_LOG_FILE) > /dev/null 2>&1 &
 
 # Full CI pipeline: format, clippy, test, build
 .PHONY: ci

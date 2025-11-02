@@ -25,7 +25,11 @@ Cargo.lock
 
 # Config overrides (keep the template)
 config.local.yaml
+config.prod.yaml
 
 # Log files
 *.log
 *.log.*
+
+# Features
+features/*
