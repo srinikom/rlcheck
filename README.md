@@ -133,3 +133,7 @@ The release binary is optimized for size:
 - All output is on a single line per check for easy parsing and logging
 - Content size is reported in bytes for every request
 - Errors include the error message directly in the output line
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details
