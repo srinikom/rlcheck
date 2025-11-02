@@ -49,13 +49,18 @@ cargo run -- path/to/your-config.yaml
 
 ## Output
 
-The program will display:
+The program displays simple, structured output on a single line with these key fields:
 
-- ✅ When a site comes UP (was previously down)
-- ❌ When a site goes DOWN (was previously up)
-- 🔄 When a site's content changes
-- ℹ️ Current status on each check
-- Content hash comparison (first 16 chars)
+- **website**: The URL being monitored
+- **load_time**: Response time in milliseconds
+- **status**: up, down, or error
+- **size**: Content size in bytes
+- **content_hash**: First 5 characters of the MD5 hash
+
+Additional notifications on separate lines:
+- Status changes (up ↔ down)
+- Content changes
+- Error details
 
 ## Example Output
 
@@ -68,31 +73,31 @@ Monitoring 2 site(s):
 
 Starting monitoring... (Press Ctrl+C to stop)
 
-[https://example.com] Checking...
-ℹ️  [https://example.com] Status: UP
-   First check - baseline established
+website: https://example.com | load_time: 143ms | status: up | size: 18585bytes | content_hash: 05f75
 
-[https://httpbin.org/status/200] Checking...
-ℹ️  [https://httpbin.org/status/200] Status: UP
-   First check - baseline established
+website: https://httpbin.org/status/200 | load_time: 305ms | status: up | size: 0bytes | content_hash: d41d8
 
-[https://example.com] Checking...
-ℹ️  [https://example.com] Status: UP
-🔄 [https://example.com] Content CHANGED!
-   Old hash: 3338be695e29...
-   New hash: 84983e441c3b...
+website: https://example.com | load_time: 167ms | status: up | size: 18627bytes | content_hash: a3f8d
+  content changed
+
+website: https://httpbin.org/status/200 | load_time: 298ms | status: up | size: 0bytes | content_hash: d41d8
+
+website: https://example.com | load_time: n/a | status: error
+  error: Request failed: connection timeout
+  status changed: up -> down
 ```
 
 ## Dependencies
 
 - `reqwest` - HTTP client
 - `serde` & `serde_yaml` - Configuration parsing
-- `sha2` - Content hashing
+- `md5` - Content hashing
 - `tokio` - Async runtime
 
 ## Notes
 
 - The program runs indefinitely until stopped with Ctrl+C
 - Each site is monitored concurrently in its own async task
-- Content changes are detected by comparing SHA-256 hashes of the response body
-- The first check for each site establishes a baseline (no change reported)
+- Content changes are detected by comparing MD5 hashes of the response body
+- Every check displays: URL, load time, status, content size, and MD5 hash on a single line
+- Content size is reported in bytes for every request

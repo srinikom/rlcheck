@@ -1,8 +1,7 @@
 use reqwest;
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 use std::fs;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use tokio::time;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -19,10 +18,13 @@ struct Site {
 #[derive(Debug, Clone)]
 struct SiteState {
     last_hash: Option<String>,
+    last_size: Option<usize>,
     is_up: bool,
 }
 
-async fn check_site(url: &str) -> Result<(bool, String), String> {
+async fn check_site(url: &str) -> Result<(bool, String, usize, u128), String> {
+    let start = Instant::now();
+    
     match reqwest::get(url).await {
         Ok(response) => {
             let status = response.status();
@@ -30,10 +32,10 @@ async fn check_site(url: &str) -> Result<(bool, String), String> {
             
             match response.text().await {
                 Ok(body) => {
-                    let mut hasher = Sha256::new();
-                    hasher.update(body.as_bytes());
-                    let hash = format!("{:x}", hasher.finalize());
-                    Ok((is_up, hash))
+                    let load_time = start.elapsed().as_millis();
+                    let content_size = body.len();
+                    let hash = format!("{:x}", md5::compute(body.as_bytes()));
+                    Ok((is_up, hash, content_size, load_time))
                 }
                 Err(e) => Err(format!("Failed to read response body: {}", e)),
             }
@@ -49,41 +51,39 @@ async fn monitor_site(site: Site, mut state: SiteState) {
     loop {
         interval_timer.tick().await;
         
-        println!("\n[{}] Checking...", site.url);
-        
         match check_site(&site.url).await {
-            Ok((is_up, hash)) => {
+            Ok((is_up, hash, content_size, load_time)) => {
+                let status = if is_up { "up" } else { "down" };
+                let hash_short = &hash[..5.min(hash.len())];
+                
+                // Simple structured output with hash on same line
+                println!("website: {} | load_time: {}ms | status: {} | size: {}bytes | content_hash: {}", 
+                         site.url, load_time, status, content_size, hash_short);
+                
                 // Check if status changed
                 if state.is_up != is_up {
                     if is_up {
-                        println!("✅ [{}] Site is UP (was down)", site.url);
+                        println!("  status changed: down -> up");
                     } else {
-                        println!("❌ [{}] Site is DOWN (was up)", site.url);
+                        println!("  status changed: up -> down");
                     }
                     state.is_up = is_up;
-                } else {
-                    println!("ℹ️  [{}] Status: {}", site.url, if is_up { "UP" } else { "DOWN" });
                 }
                 
                 // Check if content changed
                 if let Some(last_hash) = &state.last_hash {
                     if last_hash != &hash {
-                        println!("🔄 [{}] Content CHANGED!", site.url);
-                        println!("   Old hash: {}...", &last_hash[..16]);
-                        println!("   New hash: {}...", &hash[..16]);
-                    } else {
-                        println!("   Content unchanged");
+                        println!("  content changed");
                     }
-                } else {
-                    println!("   First check - baseline established");
                 }
                 
                 state.last_hash = Some(hash);
+                state.last_size = Some(content_size);
             }
             Err(e) => {
-                println!("❌ [{}] Error: {}", site.url, e);
+                println!("website: {} | load_time: n/a | status: error", site.url);
+                println!("  error: {}", e);
                 if state.is_up {
-                    println!("   Site is now DOWN");
                     state.is_up = false;
                 }
             }
@@ -123,6 +123,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     for site in config.sites {
         let state = SiteState {
             last_hash: None,
+            last_size: None,
             is_up: true,
         };
         
