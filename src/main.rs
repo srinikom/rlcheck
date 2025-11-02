@@ -191,9 +191,12 @@ async fn monitor_site(site: Site, mut state: SiteState, logger: Logger) {
                 let status = if is_up { "up" } else { "down" };
                 let hash_short = &hash[..5.min(hash.len())];
                 
-                // Simple structured output with hash on same line
-                let main_msg = format!("url: {} | load_time: {}ms | status: {} | size: {}bytes | content_hash: {}", 
-                         site.url, load_time, status, content_size, hash_short);
+                // Get current timestamp
+                let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
+                
+                // Simple structured output with time as first column
+                let main_msg = format!("time: {} | url: {} | load_time: {}ms | status: {} | size: {}bytes | content_hash: {}", 
+                         timestamp, site.url, load_time, status, content_size, hash_short);
                 logger.log(&main_msg);
                 
                 // Update state
@@ -202,7 +205,8 @@ async fn monitor_site(site: Site, mut state: SiteState, logger: Logger) {
                 state.last_size = Some(content_size);
             }
             Err(e) => {
-                let error_msg = format!("url: {} | load_time: n/a | status: error | error: {}", site.url, e);
+                let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
+                let error_msg = format!("time: {} | url: {} | load_time: n/a | status: error | error: {}", timestamp, site.url, e);
                 logger.log(&error_msg);
                 state.is_up = false;
             }
