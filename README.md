@@ -5,10 +5,12 @@ A Rust program that monitors websites for uptime and content changes.
 ## Features
 
 - ✅ Checks if websites are up (HTTP status)
-- 🔄 Detects content changes using SHA-256 hashing
+- 🔄 Detects content changes using MD5 hashing
 - ⚙️ Configurable check intervals per site
 - 📋 YAML configuration file
 - 🔄 Monitors multiple sites concurrently
+- 📝 Optional logging to file with automatic log rotation
+- 🔄 Log rotation: maintains up to 4 log files with 20K lines each
 
 ## Configuration
 
@@ -44,8 +46,32 @@ cargo run
 ### Run with custom config file
 
 ```bash
-cargo run -- path/to/your-config.yaml
+cargo run -- --config path/to/your-config.yaml
 ```
+
+### Run with logging enabled
+
+```bash
+cargo run -- --log-file monitor.log
+```
+
+### Command-line options
+
+- `-c, --config <FILE>`: Path to config file (default: config.yaml)
+- `-l, --log-file <FILE>`: Path to log file (optional)
+- `-h, --help`: Print help information
+
+### Log Rotation
+
+When logging is enabled, the monitor automatically rotates log files:
+- Maximum 4 log files maintained (monitor.log, monitor.log.1, monitor.log.2, monitor.log.3)
+- Each log file can contain up to 20,000 lines
+- When the current log reaches 20K lines, it's rotated:
+  - monitor.log → monitor.log.1
+  - monitor.log.1 → monitor.log.2
+  - monitor.log.2 → monitor.log.3
+  - monitor.log.3 is deleted
+  - New monitor.log is created
 
 ## Output
 
@@ -93,6 +119,7 @@ website: https://example.com | load_time: n/a | status: error
 - `serde` & `serde_yaml` - Configuration parsing
 - `md5` - Content hashing
 - `tokio` - Async runtime
+- `clap` - Command-line argument parsing
 
 ## Notes
 

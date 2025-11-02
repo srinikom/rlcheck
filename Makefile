@@ -42,7 +42,12 @@ run-release:
 # Run with a specific config file
 .PHONY: run-config
 run-config:
-	$(CARGO) run -- $(CONFIG_FILE)
+	$(CARGO) run -- --config $(CONFIG_FILE)
+
+# Run with logging enabled
+.PHONY: run-log
+run-log:
+	$(CARGO) run -- --log-file monitor.log
 
 # Check the code without building
 .PHONY: check
@@ -94,6 +99,7 @@ help:
 	@echo "  make run           - Run the utility (debug mode)"
 	@echo "  make run-release   - Run the utility (release mode)"
 	@echo "  make run-config    - Run with config file"
+	@echo "  make run-log       - Run with logging enabled"
 	@echo "  make check         - Check code without building"
 	@echo "  make fmt           - Format the code"
 	@echo "  make fmt-check     - Check code formatting"
