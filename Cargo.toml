@@ -1,12 +1,22 @@
 [package]
 name = "rlcheck"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
+description = "A Rust program that live checks web endpoints. Use this to make serverless endpoints always hot/warm."
+license = "MIT"
+repository = "https://github.com/srinikom/rlcheck.git"
 
 [dependencies]
-reqwest = { version = "0.12", features = ["blocking"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.9"
 md5 = "0.7"
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
 clap = { version = "4.5", features = ["derive"] }
+
+[profile.release]
+opt-level = "z"     # Optimize for size
+lto = true          # Enable Link Time Optimization
+codegen-units = 1   # Better optimization
+strip = true        # Strip symbols from binary
+panic = "abort"     # Abort on panic (smaller binary)

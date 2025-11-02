@@ -117,6 +117,14 @@ url: https://example.com | load_time: n/a | status: error | error: Request faile
 - `tokio` - Async runtime
 - `clap` - Command-line argument parsing
 
+## Binary Optimization
+
+The release binary is optimized for size:
+- **Size**: ~1.7MB (stripped)
+- **Optimizations**: LTO enabled, size optimization (`opt-level = "z"`), stripped symbols
+- **TLS**: Uses rustls instead of native-tls for smaller footprint
+- Minimal tokio runtime with only required features
+
 ## Notes
 
 - The program runs indefinitely until stopped with Ctrl+C
