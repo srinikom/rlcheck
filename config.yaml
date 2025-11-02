@@ -1,7 +1,5 @@
 sites:
-  - url: "https://example.com"
-    interval: 30
   - url: "https://httpbin.org/status/200"
-    interval: 60
+    interval: 2
   - url: "https://www.rust-lang.org"
-    interval: 45
+    interval: 2
