@@ -1,10 +1,13 @@
 # rlcheck - Rust live check tool
 
-A Rust program that live checks websites for uptime and content changes.
+A Rust program that live checks web endpoints for uptime and content changes.
+
+- Use this to make serverless endpoints always hot/warm.
+- Designed to be simple and lightweight to be able to run even on SBCs.
 
 ## Features
 
-- Checks if websites are up (HTTP status)
+- Checks if web endpoints are up (HTTP status)
 - Detects content changes using MD5 hashing
 - Configurable check intervals per site
 - YAML configuration file
@@ -26,7 +29,7 @@ sites:
 
 ### Config Fields
 
-- `url`: The website URL to monitor (must include protocol: http:// or https://)
+- `url`: The web enpoint URL to monitor (must include protocol: http:// or https://)
 - `interval`: How often to check the site (in seconds)
 
 ## Usage
@@ -77,16 +80,12 @@ When logging is enabled, the monitor automatically rotates log files:
 
 The program displays simple, structured output on a single line with these key fields:
 
-- **website**: The URL being monitored
+- **url**: The URL being monitored
 - **load_time**: Response time in milliseconds
 - **status**: up, down, or error
 - **size**: Content size in bytes
 - **content_hash**: First 5 characters of the MD5 hash
-
-Additional notifications on separate lines:
-- Status changes (up ↔ down)
-- Content changes
-- Error details
+- **error**: Error message (only for error status)
 
 ## Example Output
 
@@ -99,18 +98,15 @@ Monitoring 2 site(s):
 
 Starting monitoring... (Press Ctrl+C to stop)
 
-website: https://example.com | load_time: 143ms | status: up | size: 18585bytes | content_hash: 05f75
+url: https://example.com | load_time: 143ms | status: up | size: 18585bytes | content_hash: 05f75
 
-website: https://httpbin.org/status/200 | load_time: 305ms | status: up | size: 0bytes | content_hash: d41d8
+url: https://httpbin.org/status/200 | load_time: 305ms | status: up | size: 0bytes | content_hash: d41d8
 
-website: https://example.com | load_time: 167ms | status: up | size: 18627bytes | content_hash: a3f8d
-  content changed
+url: https://example.com | load_time: 167ms | status: up | size: 18627bytes | content_hash: a3f8d
 
-website: https://httpbin.org/status/200 | load_time: 298ms | status: up | size: 0bytes | content_hash: d41d8
+url: https://httpbin.org/status/200 | load_time: 298ms | status: up | size: 0bytes | content_hash: d41d8
 
-website: https://example.com | load_time: n/a | status: error
-  error: Request failed: connection timeout
-  status changed: up -> down
+url: https://example.com | load_time: n/a | status: error | error: Request failed: connection timeout
 ```
 
 ## Dependencies
@@ -126,5 +122,6 @@ website: https://example.com | load_time: n/a | status: error
 - The program runs indefinitely until stopped with Ctrl+C
 - Each site is monitored concurrently in its own async task
 - Content changes are detected by comparing MD5 hashes of the response body
-- Every check displays: URL, load time, status, content size, and MD5 hash on a single line
+- All output is on a single line per check for easy parsing and logging
 - Content size is reported in bytes for every request
+- Errors include the error message directly in the output line

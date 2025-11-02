@@ -192,37 +192,19 @@ async fn monitor_site(site: Site, mut state: SiteState, logger: Logger) {
                 let hash_short = &hash[..5.min(hash.len())];
                 
                 // Simple structured output with hash on same line
-                let main_msg = format!("website: {} | load_time: {}ms | status: {} | size: {}bytes | content_hash: {}", 
+                let main_msg = format!("url: {} | load_time: {}ms | status: {} | size: {}bytes | content_hash: {}", 
                          site.url, load_time, status, content_size, hash_short);
                 logger.log(&main_msg);
                 
-                // Check if status changed
-                if state.is_up != is_up {
-                    if is_up {
-                        logger.log("  status changed: down -> up");
-                    } else {
-                        logger.log("  status changed: up -> down");
-                    }
-                    state.is_up = is_up;
-                }
-                
-                // Check if content changed
-                if let Some(last_hash) = &state.last_hash {
-                    if last_hash != &hash {
-                        logger.log("  content changed");
-                    }
-                }
-                
+                // Update state
+                state.is_up = is_up;
                 state.last_hash = Some(hash);
                 state.last_size = Some(content_size);
             }
             Err(e) => {
-                let error_msg = format!("website: {} | load_time: n/a | status: error", site.url);
+                let error_msg = format!("url: {} | load_time: n/a | status: error | error: {}", site.url, e);
                 logger.log(&error_msg);
-                logger.log(&format!("  error: {}", e));
-                if state.is_up {
-                    state.is_up = false;
-                }
+                state.is_up = false;
             }
         }
     }

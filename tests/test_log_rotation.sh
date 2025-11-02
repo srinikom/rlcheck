@@ -6,7 +6,7 @@ rm -f test.log test.log.*
 
 # Create a log file with just over 20K lines
 for i in {1..20005}; do
-    echo "Test line $i: website: https://example.com | load_time: 100ms | status: up | size: 1000bytes | content_hash: abc12" >> test.log
+    echo "Test line $i: url: https://example.com | load_time: 100ms | status: up | size: 1000bytes | content_hash: abc12" >> test.log
 done
 
 echo "Created test.log with $(wc -l < test.log) lines"

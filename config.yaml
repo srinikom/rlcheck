@@ -1,5 +1,7 @@
 sites:
+# List of sites to monitor
+  # complete url and interval in seconds
   - url: "https://httpbin.org/status/200"
-    interval: 2
+    interval: 30
   - url: "https://www.rust-lang.org"
-    interval: 2
+    interval: 30
